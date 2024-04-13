@@ -1,0 +1,82 @@
+package com.koudlf.keysforcommand;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.critereon.*;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.StatType;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
+
+import static com.koudlf.keysforcommand.KeysForCommand.MODID;
+
+public class KeysTrigger extends SimpleCriterionTrigger<KeysTrigger.TriggerInstance> {
+
+    public static final IForgeRegistry<StatType<?>> KEYS = RegistryManager.ACTIVE.getRegistry(ResourceKey.createRegistryKey(new ResourceLocation(MODID)));
+
+    //public static final DeferredRegister<StatType<?>> STAT_TYPES = DeferredRegister.create(KEYS, "key");
+    //public static final RegistryObject<StatType<?>> REGISTRY_OBJECT = STAT_TYPES
+    //        .register("press", () -> new StatType<>(BuiltInRegistries.TRIGGER_TYPES, Component.translatable("")));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public @NotNull Codec<KeysTrigger.TriggerInstance> codec() {
+        return KeysTrigger.TriggerInstance.CODEC;
+    }
+
+    public void trigger(ServerPlayer player) {
+        this.trigger(player, i -> true);
+    }
+
+    public record TriggerInstance(Optional<ContextAwarePredicate> player) implements SimpleCriterionTrigger.SimpleInstance {
+        public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create((p) -> p.group(ExtraCodecs
+                .strictOptionalField(EntityPredicate.ADVANCEMENT_CODEC, "player")
+                .forGetter(TriggerInstance::player))
+                .apply(p, TriggerInstance::new));
+
+        //public static Criterion<TriggerInstance> usedTotem(ItemPredicate p_298404_) {
+        //    return KEYS_TRIGGER.createCriterion(new TriggerInstance(Optional.empty()));
+        //}
+//
+        //public static Criterion<TriggerInstance> usedTotem(ItemLike p_300178_) {
+        //    return KEYS_TRIGGER.createCriterion(new TriggerInstance(Optional.empty()));
+        //}
+//
+        //public static Criterion<TriggerInstance> keys() {
+        //    return KEYS_TRIGGER.createCriterion(new TriggerInstance(Optional.empty()));
+        //}
+
+        public @NotNull Optional<ContextAwarePredicate> player() {
+            return this.player;
+        }
+    }
+
+
+    public static void registerScoreboard() {
+        CriteriaTriggers.register("key", new KeysTrigger());
+    }
+}
